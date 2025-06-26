@@ -83,7 +83,7 @@ function App() {
     const lng = userLongitude || defaultLng;
     const zoom = userLatitude ? 15 : 13.1;
     
-    return `https://www.google.com/maps/embed/v1/view?key=YOUR_API_KEY_HERE&center=${lat},${lng}&zoom=${zoom}&maptype=roadmap&language=ja&region=jp`;
+    return `https://www.google.com/maps/embed/v1/view?key=AIzaSyA0sIJoIzT0Z6Bsj3Sw6LEh0_tLixgxMpY&center=${lat},${lng}&zoom=${zoom}&maptype=roadmap&language=ja&region=jp`;
   };
 
   const handleCategoryChange = (category: string, checked: boolean) => {
