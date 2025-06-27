@@ -60,8 +60,8 @@ const ReceiptGeneration: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">領収書発行</h1>
-          <p className="text-gray-600">領収書の生成・管理・PDF出力</p>
+          <h1 className="text-2xl font-bold text-foreground">領収書発行</h1>
+          <p className="text-muted-foreground">領収書の生成・管理・PDF出力</p>
         </div>
         <Button className="flex items-center space-x-2">
           <Download className="h-4 w-4" />
@@ -97,10 +97,10 @@ const ReceiptGeneration: React.FC = () => {
             <CardTitle className="text-sm">総領収書金額</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-chart-2">
               {formatCurrency(totalAmount)}
             </div>
-            <p className="text-xs text-gray-500">検索結果の合計</p>
+            <p className="text-xs text-muted-foreground">検索結果の合計</p>
           </CardContent>
         </Card>
 
@@ -109,10 +109,10 @@ const ReceiptGeneration: React.FC = () => {
             <CardTitle className="text-sm">発行ポイント数</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-chart-1">
               {formatNumber(totalPoints)} pt
             </div>
-            <p className="text-xs text-gray-500">検索結果の合計</p>
+            <p className="text-xs text-muted-foreground">検索結果の合計</p>
           </CardContent>
         </Card>
 
@@ -121,10 +121,10 @@ const ReceiptGeneration: React.FC = () => {
             <CardTitle className="text-sm">領収書件数</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold text-foreground">
               {filteredReceipts.length} 件
             </div>
-            <p className="text-xs text-gray-500">検索結果</p>
+            <p className="text-xs text-muted-foreground">検索結果</p>
           </CardContent>
         </Card>
       </div>
@@ -139,11 +139,11 @@ const ReceiptGeneration: React.FC = () => {
         <CardContent>
           <div className="space-y-4">
             {filteredReceipts.map((receipt) => (
-              <div key={receipt.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+              <div key={receipt.id} className="border border-border rounded-lg p-4 hover:bg-accent/50">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="font-semibold text-gray-900">{receipt.receiptNumber}</h3>
+                      <h3 className="font-semibold text-foreground">{receipt.receiptNumber}</h3>
                       <Badge variant="outline" className="text-xs">
                         {receipt.transactionId}
                       </Badge>
@@ -156,25 +156,25 @@ const ReceiptGeneration: React.FC = () => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                       <div>
-                        <p className="text-sm text-gray-600">顧客名</p>
+                        <p className="text-sm text-muted-foreground">顧客名</p>
                         <p className="font-medium">{receipt.customerName}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">発行日時</p>
+                        <p className="text-sm text-muted-foreground">発行日時</p>
                         <p className="font-medium">{formatDate(receipt.issueDate)}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">合計金額</p>
-                        <p className="font-medium text-green-600">{formatCurrency(receipt.total)}</p>
+                        <p className="text-sm text-muted-foreground">合計金額</p>
+                        <p className="font-medium text-chart-2">{formatCurrency(receipt.total)}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600">発行ポイント</p>
-                        <p className="font-medium text-blue-600">{formatNumber(receipt.pointsIssued)} pt</p>
+                        <p className="text-sm text-muted-foreground">発行ポイント</p>
+                        <p className="font-medium text-chart-1">{formatNumber(receipt.pointsIssued)} pt</p>
                       </div>
                     </div>
 
                     <div className="mb-3">
-                      <p className="text-sm text-gray-600 mb-2">購入商品</p>
+                      <p className="text-sm text-muted-foreground mb-2">購入商品</p>
                       <div className="space-y-1">
                         {receipt.items.map((item, index) => (
                           <div key={index} className="flex justify-between text-sm">
@@ -212,14 +212,14 @@ const ReceiptGeneration: React.FC = () => {
           </div>
 
           {filteredReceipts.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-muted-foreground">
               検索条件に一致する領収書が見つかりませんでした。
             </div>
           )}
         </CardContent>
       </Card>
 
-      <div className="text-xs text-gray-500">
+      <div className="text-xs text-muted-foreground">
         ※ 領収書データはFirestoreから取得予定。現在はモックデータを表示しています。
         <br />
         ※ PDF生成機能は実装予定です。現在はデモ表示となっています。

@@ -53,8 +53,8 @@ const StoreSettings: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">店舗設定</h1>
-          <p className="text-gray-600">店舗情報・ポイント設定・決済情報の管理</p>
+          <h1 className="text-2xl font-bold text-foreground">店舗設定</h1>
+          <p className="text-muted-foreground">店舗情報・ポイント設定・決済情報の管理</p>
         </div>
         <div className="flex space-x-2">
           {isEditing ? (
@@ -86,7 +86,7 @@ const StoreSettings: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 店舗名
               </label>
               <Input
@@ -97,7 +97,7 @@ const StoreSettings: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 オーナー名
               </label>
               <Input
@@ -108,7 +108,7 @@ const StoreSettings: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 メールアドレス
               </label>
               <div className="relative">
@@ -123,7 +123,7 @@ const StoreSettings: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 電話番号
               </label>
               <div className="relative">
@@ -138,7 +138,7 @@ const StoreSettings: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 住所
               </label>
               <div className="relative">
@@ -147,7 +147,7 @@ const StoreSettings: React.FC = () => {
                   value={storeData.address}
                   onChange={(e) => setStoreData({...storeData, address: e.target.value})}
                   disabled={!isEditing}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  className="w-full pl-10 pr-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary disabled:bg-muted disabled:text-muted-foreground"
                   rows={2}
                 />
               </div>
@@ -164,7 +164,7 @@ const StoreSettings: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
                 ポイント還元率 (%)
               </label>
               <Input
@@ -175,14 +175,14 @@ const StoreSettings: React.FC = () => {
                 min="1"
                 max="20"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 1% ～ 20% の範囲で設定可能です
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
                   店舗ステータス
                 </label>
                 <div className="mt-2">
@@ -190,18 +190,18 @@ const StoreSettings: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
                   登録日
                 </label>
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-muted-foreground mt-2">
                   {formatDate(storeData.registrationDate)}
                 </p>
               </div>
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-2">ポイント発行について</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
+            <div className="bg-chart-1/10 p-4 rounded-lg border border-chart-1/20">
+              <h4 className="font-medium text-chart-1 mb-2">ポイント発行について</h4>
+              <ul className="text-sm text-chart-1 space-y-1">
                 <li>• 購入金額の{storeData.pointRate}%がポイントとして発行されます</li>
                 <li>• ポイントは即座に顧客アカウントに反映されます</li>
                 <li>• 残高不足時は自動的にポイント発行が停止されます</li>
@@ -220,18 +220,18 @@ const StoreSettings: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
                   現在残高
                 </label>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-2xl font-bold text-chart-2">
                   {formatCurrency(storeData.balance)}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
                   月額利用料
                 </label>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-2xl font-bold text-foreground">
                   {formatCurrency(storeData.monthlyFee)}
                 </p>
               </div>
@@ -265,7 +265,7 @@ const StoreSettings: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
                   開店時間
                 </label>
                 <Input
@@ -275,7 +275,7 @@ const StoreSettings: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
                   閉店時間
                 </label>
                 <Input
@@ -287,7 +287,7 @@ const StoreSettings: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
                 定休日
               </label>
               <div className="grid grid-cols-7 gap-2">
@@ -307,7 +307,7 @@ const StoreSettings: React.FC = () => {
         </Card>
       </div>
 
-      <div className="text-xs text-gray-500">
+      <div className="text-xs text-muted-foreground">
         ※ 店舗設定はFirestoreに保存予定。現在はモックデータを表示しています。
         <br />
         ※ クレジットカード情報の変更はGMO決済システムと連携して処理されます。
