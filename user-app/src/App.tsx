@@ -346,8 +346,8 @@ function App() {
         </div>
       </header>
 
-      {/* Map Section - Always at top */}
-      <div className="bg-white border-b">
+      {/* Map Section - Mobile only (at top) */}
+      <div className="bg-white border-b lg:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Card>
             <CardHeader className="pb-3">
@@ -362,7 +362,7 @@ function App() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="h-64 sm:h-80 lg:h-96 bg-gray-100 rounded-lg overflow-hidden relative">
+              <div className="h-64 sm:h-80 bg-gray-100 rounded-lg overflow-hidden relative">
                 <iframe
                   src={getMapUrl()}
                   className="w-full h-full border-0"
@@ -601,8 +601,169 @@ function App() {
             </Card>
           </div>
 
-          {/* Store List */}
-          <div className="lg:col-span-3">
+          {/* Right Column - Map and Store List (Desktop only) */}
+          <div className="hidden lg:block lg:col-span-3">
+            <div className="space-y-6">
+              {/* Map Section */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+                      <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                      <span>近くのbiid加盟店</span>
+                    </CardTitle>
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs sm:text-sm">
+                      {filteredStores.length}件
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-96 bg-gray-100 rounded-lg overflow-hidden relative">
+                    <iframe
+                      src={getMapUrl()}
+                      className="w-full h-full border-0"
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                    
+                    {/* Map Pins Overlay */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      {filteredStores.slice(0, 8).map((store, index) => {
+                        const positions = [
+                          { top: '25%', left: '35%' }, { top: '45%', left: '55%' }, 
+                          { top: '35%', left: '25%' }, { top: '55%', left: '45%' },
+                          { top: '30%', left: '65%' }, { top: '65%', left: '35%' },
+                          { top: '40%', left: '75%' }, { top: '70%', left: '25%' }
+                        ];
+                        const pos = positions[index];
+                        
+                        return (
+                          <div
+                            key={store.id}
+                            className="absolute transform -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer"
+                            style={{ top: pos.top, left: pos.left }}
+                            onClick={() => setSelectedStore(store)}
+                          >
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg ${
+                              store.biidPartner ? 'bg-blue-600' : 'bg-gray-500'
+                            }`}>
+                              {getCategoryIcon(store.category)}
+                            </div>
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded mt-1 whitespace-nowrap">
+                              {store.name}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Store List */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <StoreIcon className="h-5 w-5 text-green-600" />
+                    <span>店舗一覧</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {filteredStores.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="text-6xl mb-4">🏪</div>
+                      <h3 className="text-lg font-bold mb-2">条件に合う店舗が見つかりません</h3>
+                      <p className="text-gray-600">検索条件を調整してみてください</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4 pb-20 lg:pb-4">
+                      {filteredStores.map((store) => (
+                        <div key={store.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex flex-col sm:flex-row sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
+                            <div className="flex items-center space-x-4 sm:block sm:space-x-0">
+                              <div className="relative">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg ${
+                                  store.biidPartner ? 'bg-blue-600' : 'bg-gray-500'
+                                }`}>
+                                  {getCategoryIcon(store.category)}
+                                </div>
+                                <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
+                                  store.status === 'open' ? 'bg-green-500' : 'bg-red-500'
+                                }`}></div>
+                              </div>
+                              
+                              <div className="sm:hidden">
+                                <h3 className="font-bold text-lg">{store.name}</h3>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  <Badge variant="outline" className="text-xs">{categoryNames[store.category as keyof typeof categoryNames]}</Badge>
+                                  <Badge variant="secondary" className="text-xs">{getPriceDisplay(store.priceRange)}</Badge>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex-1">
+                              <div className="hidden sm:block">
+                                <h3 className="font-bold text-lg">{store.name}</h3>
+                                <div className="flex items-center space-x-2 mt-1">
+                                  <Badge variant="outline">{categoryNames[store.category as keyof typeof categoryNames]}</Badge>
+                                  <Badge variant="secondary">{getPriceDisplay(store.priceRange)}</Badge>
+                                  {store.biidPartner && (
+                                    <Badge className="bg-blue-100 text-blue-800">
+                                      <Award className="h-3 w-3 mr-1" />
+                                      biid加盟店
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 space-y-1 sm:space-y-0 text-sm text-gray-600">
+                                <span className="flex items-center space-x-1">
+                                  <Star className="h-4 w-4 text-yellow-500" />
+                                  <span>{store.rating} ({store.reviews}件)</span>
+                                </span>
+                                <span className="flex items-center space-x-1">
+                                  <MapPin className="h-4 w-4 text-red-500" />
+                                  <span>{store.distance}km</span>
+                                </span>
+                                <span className={`flex items-center space-x-1 ${getStatusColor(store)}`}>
+                                  <Clock className="h-4 w-4" />
+                                  <span>{getStatusDisplay(store)}</span>
+                                </span>
+                              </div>
+                              
+                              <p className="text-sm text-gray-600 mt-1">{store.address}</p>
+                              
+                              {store.biidPartner && store.pointsEarned && (
+                                <div className="flex items-center space-x-2 mt-2">
+                                  <Coins className="h-4 w-4 text-blue-600" />
+                                  <span className="text-sm text-blue-600 font-medium">
+                                    獲得ポイント: {formatNumber(store.pointsEarned)}pt (還元率: {store.pointsRate}%)
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            <div className="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2">
+                              <Button size="sm" className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 min-h-[44px]">
+                                詳細を見る
+                              </Button>
+                              <Button size="sm" variant="outline" className="flex-1 sm:flex-none min-h-[44px]">
+                                地図で確認
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Store List - Mobile only */}
+          <div className="lg:hidden">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">

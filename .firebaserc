@@ -1,5 +1,21 @@
 {
   "projects": {
     "default": "firebase-auth-dashboard-jd0xwugb"
-  }
+  },
+  "targets": {
+    "firebase-auth-dashboard-jd0xwugb": {
+      "hosting": {
+        "admin-dashboard": [
+          "firebase-auth-dashboard-fdprcfbb"
+        ],
+        "user-app": [
+          "firebase-auth-dashboard-17qy2kfa"
+        ],
+        "tenant-app": [
+          "firebase-auth-dashboard-jd0xwugb"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
