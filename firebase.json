@@ -1,27 +1,55 @@
 {
-  "hosting": {
-    "public": "tenant-app/dist",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ],
-    "headers": [
-      {
-        "source": "**/*.@(js|css)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=31536000"
-          }
-        ]
-      }
-    ]
-  }
+  "hosting": [
+    {
+      "target": "admin-dashboard",
+      "public": "admin-dashboard/dist",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [{"source": "**", "destination": "/index.html"}],
+      "headers": [
+        {
+          "source": "**/*.@(js|css)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31536000"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "target": "user-app", 
+      "public": "user-app/dist",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [{"source": "**", "destination": "/index.html"}],
+      "headers": [
+        {
+          "source": "**/*.@(js|css)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31536000"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "target": "tenant-app",
+      "public": "tenant-app/dist", 
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [{"source": "**", "destination": "/index.html"}],
+      "headers": [
+        {
+          "source": "**/*.@(js|css)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31536000"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
