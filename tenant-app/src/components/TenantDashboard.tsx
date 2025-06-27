@@ -29,12 +29,12 @@ const TenantDashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">ダッシュボード</h1>
-          <p className="text-gray-600">{mockStoreProfile.name} - 売上・運営状況</p>
+          <h1 className="text-2xl font-bold text-foreground">ダッシュボード</h1>
+          <p className="text-muted-foreground">{mockStoreProfile.name} - 売上・運営状況</p>
         </div>
         <div className="text-right">
-          <p className="text-sm text-gray-500">最終更新</p>
-          <p className="text-sm font-medium text-gray-900">
+          <p className="text-sm text-muted-foreground">最終更新</p>
+          <p className="text-sm font-medium text-foreground">
             {new Date().toLocaleDateString('ja-JP')} {new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
@@ -47,7 +47,7 @@ const TenantDashboard: React.FC = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-chart-2">
               {formatCurrency(todaySales.sales)}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -62,7 +62,7 @@ const TenantDashboard: React.FC = () => {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-chart-1">
               {formatNumber(todaySales.transactions)} 件
             </div>
             <p className="text-xs text-muted-foreground">
@@ -92,7 +92,7 @@ const TenantDashboard: React.FC = () => {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold text-foreground">
               {formatCurrency(mockStoreProfile.balance)}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -115,14 +115,14 @@ const TenantDashboard: React.FC = () => {
               {dailySales.slice(-7).map((day) => (
                 <div key={day.date} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-foreground">
                       {new Date(day.date).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' })}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-muted-foreground">
                       {day.transactions}件
                     </div>
                   </div>
-                  <div className="text-sm font-medium text-green-600">
+                  <div className="text-sm font-medium text-chart-2">
                     {formatCurrency(day.sales)}
                   </div>
                 </div>
@@ -141,26 +141,26 @@ const TenantDashboard: React.FC = () => {
           <CardContent>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">総売上</span>
-                <span className="text-lg font-bold text-green-600">
+                <span className="text-sm text-muted-foreground">総売上</span>
+                <span className="text-lg font-bold text-chart-2">
                   {formatCurrency(monthlySummary.totalSales)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">総取引件数</span>
-                <span className="text-lg font-bold text-blue-600">
+                <span className="text-sm text-muted-foreground">総取引件数</span>
+                <span className="text-lg font-bold text-chart-1">
                   {formatNumber(monthlySummary.totalTransactions)} 件
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">発行ポイント</span>
-                <span className="text-lg font-bold text-purple-600">
+                <span className="text-sm text-muted-foreground">発行ポイント</span>
+                <span className="text-lg font-bold text-chart-5">
                   {formatNumber(monthlySummary.totalPointsIssued)} pt
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">平均取引額</span>
-                <span className="text-lg font-bold text-gray-900">
+                <span className="text-sm text-muted-foreground">平均取引額</span>
+                <span className="text-lg font-bold text-foreground">
                   {formatCurrency(monthlySummary.averageTransaction)}
                 </span>
               </div>
@@ -169,7 +169,7 @@ const TenantDashboard: React.FC = () => {
         </Card>
       </div>
 
-      <div className="text-xs text-gray-500">
+      <div className="text-xs text-muted-foreground">
         ※ データはFirestoreから取得予定。現在はモックデータを表示しています。
         <br />
         ※ GMO決済システムとの連携により、リアルタイムで売上データが更新されます。
