@@ -5,8 +5,10 @@ import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Search, ShoppingCart, Download, Eye } from 'lucide-react';
+import { useIsMobile } from '../hooks/use-mobile';
 
 const SalesManagement: React.FC = () => {
+  const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredTransactions, setFilteredTransactions] = useState<SalesTransaction[]>(mockSalesTransactions);
 
@@ -86,7 +88,7 @@ const SalesManagement: React.FC = () => {
           <h1 className="text-2xl font-bold text-foreground">売上管理</h1>
           <p className="text-muted-foreground">取引履歴とポイント発行状況</p>
         </div>
-        <Button className="flex items-center space-x-2">
+        <Button className="flex items-center space-x-2 min-h-[44px]">
           <Download className="h-4 w-4" />
           <span>CSV出力</span>
         </Button>
@@ -107,14 +109,14 @@ const SalesManagement: React.FC = () => {
               onChange={(e) => handleSearch(e.target.value)}
               className="flex-1"
             />
-            <Button variant="outline">
+            <Button variant="outline" className="min-h-[44px]">
               検索
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">総売上金額</CardTitle>
@@ -160,69 +162,122 @@ const SalesManagement: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 font-medium text-foreground">取引ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">顧客名</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">購入金額</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">発行ポイント</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">決済方法</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">取引日時</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">ステータス</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredTransactions.map((transaction) => (
-                  <tr key={transaction.id} className="border-b border-border hover:bg-accent/50">
-                    <td className="py-3 px-4">
-                      <span className="font-mono text-sm text-muted-foreground">
-                        {transaction.transactionId}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="font-medium text-foreground">{transaction.customerName}</div>
-                      <div className="text-sm text-muted-foreground">{transaction.customerEmail}</div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="font-medium text-chart-2">
-                        {formatCurrency(transaction.purchaseAmount)}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="font-medium text-chart-1">
-                        {formatNumber(transaction.pointsIssued)} pt
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      {getPaymentMethodBadge(transaction.paymentMethod)}
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground">
-                      {formatDate(transaction.transactionDate)}
-                    </td>
-                    <td className="py-3 px-4">
-                      {getStatusBadge(transaction.status)}
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-3 w-3 mr-1" />
-                          詳細
-                        </Button>
-                        {transaction.receiptGenerated && (
-                          <Button variant="outline" size="sm">
-                            領収書
-                          </Button>
-                        )}
+          {isMobile ? (
+            <div className="space-y-4">
+              {filteredTransactions.map((transaction) => (
+                <Card key={transaction.id} className="border border-border">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-medium text-foreground">{transaction.customerName}</h3>
+                        <p className="text-sm text-muted-foreground">{transaction.customerEmail}</p>
+                        <p className="text-sm text-muted-foreground font-mono">{transaction.transactionId}</p>
                       </div>
-                    </td>
+                      {getStatusBadge(transaction.status)}
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">購入金額</span>
+                        <p className="font-medium text-chart-2">{formatCurrency(transaction.purchaseAmount)}</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">発行ポイント</span>
+                        <p className="font-medium text-chart-1">{formatNumber(transaction.pointsIssued)} pt</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">決済方法</span>
+                        <div className="mt-1">{getPaymentMethodBadge(transaction.paymentMethod)}</div>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">取引日時</span>
+                        <p className="font-medium">{formatDate(transaction.transactionDate)}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex space-x-2">
+                      <Button variant="outline" size="sm" className="flex-1 min-h-[44px]">
+                        <Eye className="h-3 w-3 mr-1" />
+                        詳細
+                      </Button>
+                      {transaction.receiptGenerated && (
+                        <Button variant="outline" size="sm" className="flex-1 min-h-[44px]">
+                          領収書
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 font-medium text-foreground">取引ID</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">顧客名</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">購入金額</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">発行ポイント</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">決済方法</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">取引日時</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">ステータス</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">操作</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filteredTransactions.map((transaction) => (
+                    <tr key={transaction.id} className="border-b border-border hover:bg-accent/50">
+                      <td className="py-3 px-4">
+                        <span className="font-mono text-sm text-muted-foreground">
+                          {transaction.transactionId}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="font-medium text-foreground">{transaction.customerName}</div>
+                        <div className="text-sm text-muted-foreground">{transaction.customerEmail}</div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="font-medium text-chart-2">
+                          {formatCurrency(transaction.purchaseAmount)}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="font-medium text-chart-1">
+                          {formatNumber(transaction.pointsIssued)} pt
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        {getPaymentMethodBadge(transaction.paymentMethod)}
+                      </td>
+                      <td className="py-3 px-4 text-muted-foreground">
+                        {formatDate(transaction.transactionDate)}
+                      </td>
+                      <td className="py-3 px-4">
+                        {getStatusBadge(transaction.status)}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm">
+                            <Eye className="h-3 w-3 mr-1" />
+                            詳細
+                          </Button>
+                          {transaction.receiptGenerated && (
+                            <Button variant="outline" size="sm">
+                              領収書
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {filteredTransactions.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
