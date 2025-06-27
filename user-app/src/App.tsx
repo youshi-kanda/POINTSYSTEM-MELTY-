@@ -346,8 +346,8 @@ function App() {
         </div>
       </header>
 
-      {/* Map Section - Always at top */}
-      <div className="bg-white border-b">
+      {/* Map Section - Mobile only (at top) */}
+      <div className="bg-white border-b lg:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Card>
             <CardHeader className="pb-3">
@@ -362,7 +362,7 @@ function App() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="h-64 sm:h-80 lg:h-96 bg-gray-100 rounded-lg overflow-hidden relative">
+              <div className="h-64 sm:h-80 bg-gray-100 rounded-lg overflow-hidden relative">
                 <iframe
                   src={getMapUrl()}
                   className="w-full h-full border-0"
@@ -423,9 +423,9 @@ function App() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
           {/* Sidebar */}
-          <div className={`lg:col-span-1 ${isMobile && !showFilters ? 'hidden' : ''}`}>
+          <div className={`lg:col-span-2 ${isMobile && !showFilters ? 'hidden' : ''}`}>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -602,7 +602,7 @@ function App() {
           </div>
 
           {/* Store List */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -698,6 +698,65 @@ function App() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Map Section - Desktop only (right side) */}
+          <div className="hidden lg:block lg:col-span-2">
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-center">
+                  <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+                    <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                    <span>近くのbiid加盟店</span>
+                  </CardTitle>
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs sm:text-sm">
+                    {filteredStores.length}件
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-96 bg-gray-100 rounded-lg overflow-hidden relative">
+                  <iframe
+                    src={getMapUrl()}
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                  
+                  {/* Map Pins Overlay */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    {filteredStores.slice(0, 8).map((store, index) => {
+                      const positions = [
+                        { top: '25%', left: '35%' }, { top: '45%', left: '55%' }, 
+                        { top: '35%', left: '25%' }, { top: '55%', left: '45%' },
+                        { top: '30%', left: '65%' }, { top: '65%', left: '35%' },
+                        { top: '40%', left: '75%' }, { top: '70%', left: '25%' }
+                      ];
+                      const pos = positions[index];
+                      
+                      return (
+                        <div
+                          key={store.id}
+                          className="absolute transform -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer"
+                          style={{ top: pos.top, left: pos.left }}
+                          onClick={() => setSelectedStore(store)}
+                        >
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg ${
+                            store.biidPartner ? 'bg-blue-600' : 'bg-gray-500'
+                          }`}>
+                            {getCategoryIcon(store.category)}
+                          </div>
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded mt-1 whitespace-nowrap">
+                            {store.name}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
