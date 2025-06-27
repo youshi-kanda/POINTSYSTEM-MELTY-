@@ -5,8 +5,10 @@ import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Search, CreditCard, Download, AlertCircle } from 'lucide-react';
+import { useIsMobile } from '../hooks/use-mobile';
 
 const PaymentHistory: React.FC = () => {
+  const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPayments, setFilteredPayments] = useState<PaymentRecord[]>(mockPaymentRecords);
 
@@ -77,7 +79,7 @@ const PaymentHistory: React.FC = () => {
           <h1 className="text-2xl font-bold text-foreground">決済履歴</h1>
           <p className="text-muted-foreground">GMO決済システム連携・手数料管理</p>
         </div>
-        <Button className="flex items-center space-x-2">
+        <Button className="flex items-center space-x-2 min-h-[44px]">
           <Download className="h-4 w-4" />
           <span>CSV出力</span>
         </Button>
@@ -98,14 +100,14 @@ const PaymentHistory: React.FC = () => {
               onChange={(e) => handleSearch(e.target.value)}
               className="flex-1"
             />
-            <Button variant="outline">
+            <Button variant="outline" className="min-h-[44px]">
               検索
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">総決済金額</CardTitle>
@@ -179,60 +181,105 @@ const PaymentHistory: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 font-medium text-foreground">決済ID</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">決済金額</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">手数料</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">純受取額</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">決済方法</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">決済日</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">ステータス</th>
-                  <th className="text-left py-3 px-4 font-medium text-foreground">説明</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredPayments.map((payment) => (
-                  <tr key={payment.id} className="border-b border-border hover:bg-accent/50">
-                    <td className="py-3 px-4">
-                      <span className="font-mono text-sm text-muted-foreground">
-                        {payment.paymentId}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="font-medium text-chart-2">
-                        {formatCurrency(payment.amount)}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="font-medium text-chart-3">
-                        -{formatCurrency(payment.fee)}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="font-medium text-chart-1">
-                        {formatCurrency(payment.netAmount)}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      {getPaymentMethodBadge(payment.paymentMethod)}
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground">
-                      {formatDate(payment.paymentDate)}
-                    </td>
-                    <td className="py-3 px-4">
+          {isMobile ? (
+            <div className="space-y-4">
+              {filteredPayments.map((payment) => (
+                <Card key={payment.id} className="border border-border">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="font-medium text-foreground">{payment.description}</h3>
+                        <p className="text-sm text-muted-foreground font-mono">{payment.paymentId}</p>
+                      </div>
                       {getStatusBadge(payment.status)}
-                    </td>
-                    <td className="py-3 px-4 text-muted-foreground">
-                      {payment.description}
-                    </td>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">決済金額</span>
+                        <p className="font-medium text-chart-2">{formatCurrency(payment.amount)}</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">手数料</span>
+                        <p className="font-medium text-chart-3">-{formatCurrency(payment.fee)}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">純受取額</span>
+                        <p className="font-medium text-chart-1">{formatCurrency(payment.netAmount)}</p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">決済日</span>
+                        <p className="font-medium">{formatDate(payment.paymentDate)}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mb-3 text-sm">
+                      <span className="text-muted-foreground">決済方法</span>
+                      <div className="mt-1">{getPaymentMethodBadge(payment.paymentMethod)}</div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 font-medium text-foreground">決済ID</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">決済金額</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">手数料</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">純受取額</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">決済方法</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">決済日</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">ステータス</th>
+                    <th className="text-left py-3 px-4 font-medium text-foreground">説明</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filteredPayments.map((payment) => (
+                    <tr key={payment.id} className="border-b border-border hover:bg-accent/50">
+                      <td className="py-3 px-4">
+                        <span className="font-mono text-sm text-muted-foreground">
+                          {payment.paymentId}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="font-medium text-chart-2">
+                          {formatCurrency(payment.amount)}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="font-medium text-chart-3">
+                          -{formatCurrency(payment.fee)}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="font-medium text-chart-1">
+                          {formatCurrency(payment.netAmount)}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        {getPaymentMethodBadge(payment.paymentMethod)}
+                      </td>
+                      <td className="py-3 px-4 text-muted-foreground">
+                        {formatDate(payment.paymentDate)}
+                      </td>
+                      <td className="py-3 px-4">
+                        {getStatusBadge(payment.status)}
+                      </td>
+                      <td className="py-3 px-4 text-muted-foreground">
+                        {payment.description}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {filteredPayments.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">

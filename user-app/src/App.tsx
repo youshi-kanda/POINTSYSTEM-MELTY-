@@ -3,6 +3,7 @@ import { mockUser, mockStores, Store, categoryNames, priceRangeNames } from './d
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
 import { Badge } from './components/ui/badge';
+import { useIsMobile } from './hooks/use-mobile';
 import { 
   Search, 
   MapPin, 
@@ -16,11 +17,14 @@ import {
   History,
   Settings,
   Coins,
-  Award
+  Award,
+  Menu,
+  X
 } from 'lucide-react';
 import './App.css';
 
 function App() {
+  const isMobile = useIsMobile();
   const [selectedDistance, setSelectedDistance] = useState(3);
   const [filteredStores, setFilteredStores] = useState<Store[]>(mockStores);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -34,6 +38,8 @@ function App() {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const distanceOptions = [
     { value: 0.5, label: '500m' },
@@ -284,8 +290,18 @@ function App() {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* User Info */}
-            <div className="flex items-center space-x-4">
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden mr-2"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            
+            {/* User Info - Hide on mobile */}
+            <div className="hidden sm:flex items-center space-x-4">
               <div className="flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-lg">
                 <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
                   {mockUser.name.charAt(0)}
@@ -306,12 +322,12 @@ function App() {
 
             {/* Logo */}
             <div className="flex items-center space-x-2">
-              <StoreIcon className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-blue-600">biid StoreConnect</span>
+              <StoreIcon className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
+              <span className="text-lg sm:text-2xl font-bold text-blue-600">biid StoreConnect</span>
             </div>
 
-            {/* Navigation */}
-            <nav className="flex items-center space-x-6">
+            {/* Desktop Navigation - Hide on mobile */}
+            <nav className="hidden lg:flex items-center space-x-6">
               <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">店舗検索</a>
               <a href="#" className="text-gray-500 hover:text-blue-600 flex items-center space-x-1">
                 <Heart className="h-4 w-4" />
@@ -330,11 +346,86 @@ function App() {
         </div>
       </header>
 
+      {/* Map Section - Always at top */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-center">
+                <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                  <span>近くのbiid加盟店</span>
+                </CardTitle>
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs sm:text-sm">
+                  {filteredStores.length}件
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64 sm:h-80 lg:h-96 bg-gray-100 rounded-lg overflow-hidden relative">
+                <iframe
+                  src={getMapUrl()}
+                  className="w-full h-full border-0"
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+                
+                {/* Map Pins Overlay */}
+                <div className="absolute inset-0 pointer-events-none">
+                  {filteredStores.slice(0, 8).map((store, index) => {
+                    const positions = [
+                      { top: '25%', left: '35%' }, { top: '45%', left: '55%' }, 
+                      { top: '35%', left: '25%' }, { top: '55%', left: '45%' },
+                      { top: '30%', left: '65%' }, { top: '65%', left: '35%' },
+                      { top: '40%', left: '75%' }, { top: '70%', left: '25%' }
+                    ];
+                    const pos = positions[index];
+                    
+                    return (
+                      <div
+                        key={store.id}
+                        className="absolute transform -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer"
+                        style={{ top: pos.top, left: pos.left }}
+                        onClick={() => setSelectedStore(store)}
+                      >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg ${
+                          store.biidPartner ? 'bg-blue-600' : 'bg-gray-500'
+                        }`}>
+                          {getCategoryIcon(store.category)}
+                        </div>
+                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded mt-1 whitespace-nowrap">
+                          {store.name}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Mobile Filter Toggle */}
+        {isMobile && (
+          <div className="mb-4">
+            <Button
+              onClick={() => setShowFilters(!showFilters)}
+              variant="outline"
+              className="w-full flex items-center justify-center space-x-2 min-h-[44px]"
+            >
+              <Filter className="h-4 w-4" />
+              <span>フィルター {showFilters ? '非表示' : '表示'}</span>
+            </Button>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
-          <div className="lg:col-span-1">
+          <div className={`lg:col-span-1 ${isMobile && !showFilters ? 'hidden' : ''}`}>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -346,7 +437,7 @@ function App() {
                 {/* Location Button */}
                 <Button 
                   onClick={getCurrentLocation}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-blue-600 hover:bg-blue-700 min-h-[44px]"
                 >
                   <Navigation className="h-4 w-4 mr-2" />
                   現在地を取得
@@ -510,66 +601,8 @@ function App() {
             </Card>
           </div>
 
-          {/* Main Content Area */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Map Section */}
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle className="flex items-center space-x-2">
-                    <MapPin className="h-5 w-5 text-blue-600" />
-                    <span>近くのbiid加盟店</span>
-                  </CardTitle>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    {filteredStores.length}件の店舗が見つかりました
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-96 bg-gray-100 rounded-lg overflow-hidden relative">
-                  <iframe
-                    src={getMapUrl()}
-                    className="w-full h-full border-0"
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                  
-                  {/* Map Pins Overlay */}
-                  <div className="absolute inset-0 pointer-events-none">
-                    {filteredStores.slice(0, 8).map((store, index) => {
-                      const positions = [
-                        { top: '25%', left: '35%' }, { top: '45%', left: '55%' }, 
-                        { top: '35%', left: '25%' }, { top: '55%', left: '45%' },
-                        { top: '30%', left: '65%' }, { top: '65%', left: '35%' },
-                        { top: '40%', left: '75%' }, { top: '70%', left: '25%' }
-                      ];
-                      const pos = positions[index];
-                      
-                      return (
-                        <div
-                          key={store.id}
-                          className="absolute transform -translate-x-1/2 -translate-y-full pointer-events-auto cursor-pointer"
-                          style={{ top: pos.top, left: pos.left }}
-                          onClick={() => setSelectedStore(store)}
-                        >
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg ${
-                            store.biidPartner ? 'bg-blue-600' : 'bg-gray-500'
-                          }`}>
-                            {getCategoryIcon(store.category)}
-                          </div>
-                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded mt-1 whitespace-nowrap">
-                            {store.name}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Store List */}
+          {/* Store List */}
+          <div className="lg:col-span-3">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -585,72 +618,80 @@ function App() {
                     <p className="text-gray-600">検索条件を調整してみてください</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-4 pb-20 lg:pb-4">
                     {filteredStores.map((store) => (
                       <div key={store.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                        <div className="flex items-start space-x-4">
-                          <div className="relative">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg ${
-                              store.biidPartner ? 'bg-blue-600' : 'bg-gray-500'
-                            }`}>
-                              {getCategoryIcon(store.category)}
+                        <div className="flex flex-col sm:flex-row sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
+                          <div className="flex items-center space-x-4 sm:block sm:space-x-0">
+                            <div className="relative">
+                              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-lg ${
+                                store.biidPartner ? 'bg-blue-600' : 'bg-gray-500'
+                              }`}>
+                                {getCategoryIcon(store.category)}
+                              </div>
+                              <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
+                                store.status === 'open' ? 'bg-green-500' : 'bg-red-500'
+                              }`}></div>
                             </div>
-                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-                              store.status === 'open' ? 'bg-green-500' : 'bg-red-500'
-                            }`}></div>
+                            
+                            <div className="sm:hidden">
+                              <h3 className="font-bold text-lg">{store.name}</h3>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                <Badge variant="outline" className="text-xs">{categoryNames[store.category as keyof typeof categoryNames]}</Badge>
+                                <Badge variant="secondary" className="text-xs">{getPriceDisplay(store.priceRange)}</Badge>
+                              </div>
+                            </div>
                           </div>
                           
                           <div className="flex-1">
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <h3 className="font-bold text-lg">{store.name}</h3>
-                                <div className="flex items-center space-x-2 mt-1">
-                                  <Badge variant="outline">{categoryNames[store.category as keyof typeof categoryNames]}</Badge>
-                                  <Badge variant="secondary">{getPriceDisplay(store.priceRange)}</Badge>
-                                  {store.biidPartner && (
-                                    <Badge className="bg-blue-100 text-blue-800">
-                                      <Award className="h-3 w-3 mr-1" />
-                                      biid加盟店
-                                    </Badge>
-                                  )}
-                                </div>
-                                
-                                <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
-                                  <span className="flex items-center space-x-1">
-                                    <Star className="h-4 w-4 text-yellow-500" />
-                                    <span>{store.rating} ({store.reviews}件)</span>
-                                  </span>
-                                  <span className="flex items-center space-x-1">
-                                    <MapPin className="h-4 w-4 text-red-500" />
-                                    <span>{store.distance}km</span>
-                                  </span>
-                                  <span className={`flex items-center space-x-1 ${getStatusColor(store)}`}>
-                                    <Clock className="h-4 w-4" />
-                                    <span>{getStatusDisplay(store)}</span>
-                                  </span>
-                                </div>
-                                
-                                <p className="text-sm text-gray-600 mt-1">{store.address}</p>
-                                
-                                {store.biidPartner && store.pointsEarned && (
-                                  <div className="flex items-center space-x-2 mt-2">
-                                    <Coins className="h-4 w-4 text-blue-600" />
-                                    <span className="text-sm text-blue-600 font-medium">
-                                      獲得ポイント: {formatNumber(store.pointsEarned)}pt (還元率: {store.pointsRate}%)
-                                    </span>
-                                  </div>
+                            <div className="hidden sm:block">
+                              <h3 className="font-bold text-lg">{store.name}</h3>
+                              <div className="flex items-center space-x-2 mt-1">
+                                <Badge variant="outline">{categoryNames[store.category as keyof typeof categoryNames]}</Badge>
+                                <Badge variant="secondary">{getPriceDisplay(store.priceRange)}</Badge>
+                                {store.biidPartner && (
+                                  <Badge className="bg-blue-100 text-blue-800">
+                                    <Award className="h-3 w-3 mr-1" />
+                                    biid加盟店
+                                  </Badge>
                                 )}
                               </div>
-                              
-                              <div className="flex flex-col space-y-2">
-                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                                  詳細を見る
-                                </Button>
-                                <Button size="sm" variant="outline">
-                                  地図で確認
-                                </Button>
-                              </div>
                             </div>
+                            
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 space-y-1 sm:space-y-0 text-sm text-gray-600">
+                              <span className="flex items-center space-x-1">
+                                <Star className="h-4 w-4 text-yellow-500" />
+                                <span>{store.rating} ({store.reviews}件)</span>
+                              </span>
+                              <span className="flex items-center space-x-1">
+                                <MapPin className="h-4 w-4 text-red-500" />
+                                <span>{store.distance}km</span>
+                              </span>
+                              <span className={`flex items-center space-x-1 ${getStatusColor(store)}`}>
+                                <Clock className="h-4 w-4" />
+                                <span>{getStatusDisplay(store)}</span>
+                              </span>
+                            </div>
+                            
+                            <p className="text-sm text-gray-600 mt-1">{store.address}</p>
+                            
+                            {store.biidPartner && store.pointsEarned && (
+                              <div className="flex items-center space-x-2 mt-2">
+                                <Coins className="h-4 w-4 text-blue-600" />
+                                <span className="text-sm text-blue-600 font-medium">
+                                  獲得ポイント: {formatNumber(store.pointsEarned)}pt (還元率: {store.pointsRate}%)
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="flex flex-row sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2">
+                            <Button size="sm" className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 min-h-[44px]">
+                              詳細を見る
+                            </Button>
+                            <Button size="sm" variant="outline" className="flex-1 sm:flex-none min-h-[44px]">
+                              地図で確認
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -660,6 +701,89 @@ function App() {
               </CardContent>
             </Card>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Navigation Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden">
+          <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform transition-transform duration-300">
+            <div className="flex items-center justify-between p-4 border-b">
+              <span className="text-lg font-semibold">メニュー</span>
+              <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <nav className="mt-4">
+              <div className="space-y-2 px-4">
+                <a href="#" className="flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100">
+                  <Search className="h-5 w-5" />
+                  <span>店舗検索</span>
+                </a>
+                <a href="#" className="flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100">
+                  <Heart className="h-5 w-5" />
+                  <span>お気に入り</span>
+                </a>
+                <a href="#" className="flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100">
+                  <History className="h-5 w-5" />
+                  <span>履歴</span>
+                </a>
+                <a href="#" className="flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100">
+                  <Settings className="h-5 w-5" />
+                  <span>設定</span>
+                </a>
+              </div>
+              
+              {/* Mobile User Info */}
+              <div className="mt-6 px-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                      {mockUser.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900">{mockUser.name}</div>
+                      <div className="text-sm text-gray-500">ID: {mockUser.id}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg">
+                    <Coins className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-800">
+                      {formatNumber(mockUser.points)} pt
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </nav>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Navigation for Mobile */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 lg:hidden z-40">
+        <div className="flex justify-around items-center py-2">
+          <Button variant="ghost" size="sm" className="flex flex-col items-center space-y-1 py-3">
+            <Search className="h-5 w-5" />
+            <span className="text-xs">検索</span>
+          </Button>
+          <Button variant="ghost" size="sm" className="flex flex-col items-center space-y-1 py-3">
+            <Heart className="h-5 w-5" />
+            <span className="text-xs">お気に入り</span>
+          </Button>
+          <Button 
+            onClick={getCurrentLocation}
+            className="bg-blue-600 hover:bg-blue-700 rounded-full p-3"
+          >
+            <Navigation className="h-6 w-6 text-white" />
+          </Button>
+          <Button variant="ghost" size="sm" className="flex flex-col items-center space-y-1 py-3">
+            <History className="h-5 w-5" />
+            <span className="text-xs">履歴</span>
+          </Button>
+          <Button variant="ghost" size="sm" className="flex flex-col items-center space-y-1 py-3">
+            <Settings className="h-5 w-5" />
+            <span className="text-xs">設定</span>
+          </Button>
         </div>
       </div>
 
@@ -680,7 +804,7 @@ function App() {
               
               <Button 
                 variant="outline" 
-                className="mt-4"
+                className="mt-4 min-h-[44px]"
                 onClick={() => setShowLocationModal(false)}
               >
                 キャンセル
@@ -765,10 +889,10 @@ function App() {
             </div>
             
             <div className="flex space-x-2 mt-6">
-              <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
+              <Button className="flex-1 bg-blue-600 hover:bg-blue-700 min-h-[44px]">
                 詳細を見る
               </Button>
-              <Button variant="outline" className="flex-1">
+              <Button variant="outline" className="flex-1 min-h-[44px]">
                 基本情報
               </Button>
             </div>
