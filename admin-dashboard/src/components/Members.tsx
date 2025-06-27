@@ -5,10 +5,8 @@ import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Search, UserPlus } from 'lucide-react';
-import { useIsMobile } from '../hooks/use-mobile';
 
 const Members: React.FC = () => {
-  const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredMembers, setFilteredMembers] = useState<Member[]>(mockMembers);
 
@@ -48,7 +46,7 @@ const Members: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">会員一覧</h1>
           <p className="text-gray-600">biid 会員の管理</p>
         </div>
-        <Button className="flex items-center space-x-2 min-h-[44px]">
+        <Button className="flex items-center space-x-2">
           <UserPlus className="h-4 w-4" />
           <span>新規会員追加</span>
         </Button>
@@ -70,7 +68,7 @@ const Members: React.FC = () => {
               onChange={(e) => handleSearch(e.target.value)}
               className="flex-1"
             />
-            <Button variant="outline" className="min-h-[44px]">
+            <Button variant="outline">
               検索
             </Button>
           </div>
@@ -83,98 +81,55 @@ const Members: React.FC = () => {
           <CardTitle>会員リスト ({filteredMembers.length}件)</CardTitle>
         </CardHeader>
         <CardContent>
-          {isMobile ? (
-            <div className="space-y-4">
-              {filteredMembers.map((member) => (
-                <Card key={member.id} className="border border-gray-200">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="font-medium text-gray-900">{member.name}</h3>
-                        <p className="text-sm text-gray-600">{member.email}</p>
-                      </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">会員名</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">メールアドレス</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">保有ポイント</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">登録日</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">最終ログイン</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">ステータス</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredMembers.map((member) => (
+                  <tr key={member.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4">
+                      <div className="font-medium text-gray-900">{member.name}</div>
+                    </td>
+                    <td className="py-3 px-4 text-gray-600">{member.email}</td>
+                    <td className="py-3 px-4">
+                      <span className="font-medium text-blue-600">
+                        {formatNumber(member.points)} pt
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-gray-600">
+                      {formatDate(member.registeredDate)}
+                    </td>
+                    <td className="py-3 px-4 text-gray-600">
+                      {formatDate(member.lastLoginDate)}
+                    </td>
+                    <td className="py-3 px-4">
                       {getStatusBadge(member.status)}
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
-                      <div>
-                        <span className="text-gray-500">保有ポイント</span>
-                        <p className="font-medium text-blue-600">{formatNumber(member.points)} pt</p>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="sm">
+                          詳細
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          編集
+                        </Button>
                       </div>
-                      <div>
-                        <span className="text-gray-500">登録日</span>
-                        <p className="font-medium">{formatDate(member.registeredDate)}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="mb-3 text-sm">
-                      <span className="text-gray-500">最終ログイン</span>
-                      <p className="font-medium">{formatDate(member.lastLoginDate)}</p>
-                    </div>
-                    
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm" className="flex-1 min-h-[44px]">
-                        詳細
-                      </Button>
-                      <Button variant="outline" size="sm" className="flex-1 min-h-[44px]">
-                        編集
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">会員名</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">メールアドレス</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">保有ポイント</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">登録日</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">最終ログイン</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">ステータス</th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-900">操作</th>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {filteredMembers.map((member) => (
-                    <tr key={member.id} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4">
-                        <div className="font-medium text-gray-900">{member.name}</div>
-                      </td>
-                      <td className="py-3 px-4 text-gray-600">{member.email}</td>
-                      <td className="py-3 px-4">
-                        <span className="font-medium text-blue-600">
-                          {formatNumber(member.points)} pt
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-gray-600">
-                        {formatDate(member.registeredDate)}
-                      </td>
-                      <td className="py-3 px-4 text-gray-600">
-                        {formatDate(member.lastLoginDate)}
-                      </td>
-                      <td className="py-3 px-4">
-                        {getStatusBadge(member.status)}
-                      </td>
-                      <td className="py-3 px-4">
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            詳細
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            編集
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {filteredMembers.length === 0 && (
             <div className="text-center py-8 text-gray-500">
